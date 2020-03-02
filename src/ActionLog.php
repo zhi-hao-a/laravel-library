@@ -43,6 +43,35 @@ class ActionLog extends Model
         return $log;
     }
 
+    /**
+     * @deprecated
+     *
+     * @return $this
+     */
+    public static function check30sGap($request){
+        trigger_error('Method ' . __METHOD__ . ' is deprecated', E_USER_DEPRECATED);
+
+        if(env('APP_ENV') == "local"){
+            return true;
+        }
+
+        $ip = $request->ip();
+        if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
+            $ip = $_SERVER["HTTP_CF_CONNECTING_IP"];
+        }
+
+        $action = self::where('ip', $ip)
+                    ->where('function', $request->url())
+                    ->where('created_at', '>=', date('Y-m-d H:i:s', strtotime("-30 seconds")))
+                    ->get();
+	
+        if(sizeof($action) > 1){
+            return false;
+        }
+        
+        return true;
+    }
+
     public static function actionGap($request, $seconds = 10){
         if(env('APP_ENV') == "local"){
             return true;
