@@ -85,6 +85,7 @@ class ActionLog extends Model
         $action = self::where('ip', $ip)
                     ->where('function', $request->url())
                     ->where('created_at', '>=', date('Y-m-d H:i:s', strtotime("-$seconds seconds")))
+		    ->take(1)
                     ->get();
 	
         if(sizeof($action) > 1){
